@@ -1,6 +1,6 @@
 package decoder
 
-/*Retorna el mensaje tal cual lo genera el emisor del mensaje*/
+/*GetMessage retorna el mensaje tal cual lo genera el emisor del mensaje*/
 func GetMessage(messages [][]string) (msg string){
 	var min int
 	//length del mas chico
@@ -31,3 +31,5 @@ func GetMessage(messages [][]string) (msg string){
 
 	return "";
 }
+
+

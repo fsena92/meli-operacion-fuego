@@ -1,7 +1,12 @@
-package ship
+package structs
 
-/*Satellite que representa al satelite del json*/
 type Satellite struct {
+	Name string 			`json:"name"`
+	Position Position		`json:"position"`
+}
+
+/*SatelliteRequest que representa al satelite del json*/
+type SatelliteRequest struct {
 	Name string 			`json:"name"`
 	Distance float32		`json:"distance"`
 	Message []string 		`json:"message"`
@@ -9,18 +14,18 @@ type Satellite struct {
 
 /*Request representa la estructura del request para el post del nivel 2*/
 type Request struct {
-	Satellites []Satellite `json:"satellites"`
+	Satellites []SatelliteRequest `json:"satellites"`
 }
 
 /*Position representa una posicion en el plano*/
 type Position struct {
-	X float32
-	Y float32
+	X float32       	`json:"x"`
+	Y float32			`json:"y"`
 }
 
 /*Translator representa la respuesta*/
 type Translator struct {
-	Postiion Position 		`json:"position"`
+	Position Position 		`json:"position"`
 	Message []string 		`json:"message"`
 }
 

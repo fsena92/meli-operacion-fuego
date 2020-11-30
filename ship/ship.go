@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	
+	structs "github.com/fsena92/meli-operacion-fuego/structs"
+	math "github.com/fsena92/meli-operacion-fuego/math"
 )
 
 // TopSecret godoc
@@ -18,10 +19,10 @@ import (
 // @Failure 500
 // @Router /topsecret [post]
 func TopSecret(ctx *gin.Context){
-	var request Request
+	var request structs.Request
 	err := ctx.BindJSON(&request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error with body request": err.Error()})
 		return
 	}
 
@@ -33,10 +34,14 @@ func TopSecret(ctx *gin.Context){
 	}
 	//Llamar a funcion getLocation y getMessage
 	
+	x, y := math.GetLocation(distances)
 	
+	var translator structs.Translator
+	translator.Position.X = x
+	translator.Position.Y = y
 
 	fmt.Println(request)
-	ctx.JSON(http.StatusOK, request)
+	ctx.JSON(http.StatusOK, translator)
 }
 
 // TopSecretSplit godoc
@@ -52,7 +57,7 @@ func TopSecret(ctx *gin.Context){
 func TopSecretSplit(ctx *gin.Context){
 	satelliteName := ctx.Param("satellite_name")
 	fmt.Println(satelliteName)
-	var satellite Satellite
+	var satellite structs.SatelliteRequest
 	err := ctx.BindJSON(&satellite)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

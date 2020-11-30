@@ -21,9 +21,10 @@ import (
 // @BasePath /
 
 func main() {
-
+	
 	router := gin.Default()
 	api.Setup(router)
 	router.Run()
+	
 
 }
