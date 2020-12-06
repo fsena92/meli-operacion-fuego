@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/fsena92/meli-operacion-fuego/api"
 	"github.com/gin-gonic/gin"
+	"github.com/fsena92/meli-operacion-fuego/config"
 )
 
 // @title Fire Operation Api
@@ -20,11 +21,14 @@ import (
 // @host localhost:8080
 // @BasePath /
 
+
 func main() {
-	
+	config.LoadSatellites()
+
 	router := gin.Default()
 	api.Setup(router)
 	router.Run()
 	
 
 }
+

@@ -12,8 +12,8 @@ func Setup(router *gin.Engine) {
 	group := router.Group("/api")
 	{
 	group.POST("/topsecret", ship.TopSecret)
-	group.POST("/topsecret_split/:satellite_name", ship.TopSecretSplit)
-	group.GET("/topsecret_split", ship.TopSecretSplit)
+	group.POST("/topsecret_split/:satellite_name", ship.TopSecretSplitPost)
+	group.GET("/topsecret_split", ship.TopSecretSplitGet)
 	}
 	router.GET("/api/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

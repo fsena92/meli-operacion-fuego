@@ -1,5 +1,9 @@
 package structs
 
+type Configuration struct {
+	Satellites []Satellite `json:"satellites"`
+}
+
 type Satellite struct {
 	Name string 			`json:"name"`
 	Position Position		`json:"position"`
@@ -8,13 +12,13 @@ type Satellite struct {
 /*SatelliteRequest que representa al satelite del json*/
 type SatelliteRequest struct {
 	Name string 			`json:"name"`
-	Distance float32		`json:"distance"`
-	Message []string 		`json:"message"`
+	Distance float32		`json:"distance" binding:"required"`
+	Message []string 		`json:"message" binding:"required"`
 }
 
 /*Request representa la estructura del request para el post del nivel 2*/
 type Request struct {
-	Satellites []SatelliteRequest `json:"satellites"`
+	Satellites []SatelliteRequest `json:"satellites" binding:"required,dive"`
 }
 
 /*Position representa una posicion en el plano*/
@@ -26,20 +30,12 @@ type Position struct {
 /*Translator representa la respuesta*/
 type Translator struct {
 	Position Position 		`json:"position"`
-	Message []string 		`json:"message"`
+	Message  string 		`json:"message"`
 }
 
-var (
-	Kenobi    = Position{kenobiX, kenobiY}
-	Skywalker = Position{skywalkerX, skywalkerY}
-	Sato      = Position{satoX, satoY}
-)
 
-const kenobiX = -500
-const kenobiY = -200
+var AllSatellites = make(map[string]Satellite)
 
-const skywalkerX = 100
-const skywalkerY = -100
+/*SatellitesConfigured represents the list of satellites configurated in the application*/
+var SatellitesConfigured []Satellite
 
-const satoX = 500
-const satoY = 100
