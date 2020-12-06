@@ -1,4 +1,156 @@
+basePath: /
+definitions:
+  structs.Position:
+    properties:
+      x:
+        type: number
+      "y":
+        type: number
+    type: object
+  structs.Request:
+    properties:
+      satellites:
+        items:
+          $ref: '#/definitions/structs.SatelliteRequest'
+        type: array
+    required:
+    - satellites
+    type: object
+  structs.ResponseError:
+    properties:
+      description:
+        type: string
+    type: object
+  structs.SatelliteRequest:
+    properties:
+      distance:
+        type: number
+      message:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    required:
+    - distance
+    - message
+    type: object
+  structs.Translator:
+    properties:
+      message:
+        type: string
+      position:
+        $ref: '#/definitions/structs.Position'
+    type: object
+host: localhost:8080
 info:
-  contact: {}
-paths: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API Restful
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fire Operation Api
+  version: "1.0"
+paths:
+  /topsecret:
+    post:
+      consumes:
+      - application/json
+      description: Recibe un json array con la información de los satélites y retorna
+        la posicion y el mensaje del emisor
+      parameters:
+      - description: Datos necesarios de satélites para localizar la posición y obtener
+          el mensaje del emisor
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/structs.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Translator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+  /topsecret_split:
+    get:
+      consumes:
+      - application/json
+      description: Retorna la posición y el mensaje del emisor si es posible calcularlos
+        y si se registraron los satélites necesarios
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Translator'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+  /topsecret_split/{satellite_name}:
+    post:
+      consumes:
+      - application/json
+      description: Recibe un json con la información del satélite enviado por parámetro
+        y retorna el nombre del mismo si fue posible almacenarlo
+      parameters:
+      - description: Nombre del satélite necesario para poder localizar la posición
+          y obtener el mensaje del emisor
+        in: path
+        name: satellite_name
+        required: true
+        type: string
+      - description: Datos necesarios del satélite para localizar la posición y obtener
+          el mensaje del emisor
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/structs.SatelliteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.SatelliteRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ResponseError'
 swagger: "2.0"

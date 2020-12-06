@@ -33,6 +33,10 @@ type Translator struct {
 	Message  string 		`json:"message"`
 }
 
+/*ResponseError representa el error que se devuelve en la api en caso de haberlo*/
+type ResponseError struct {
+	Description string 		`json:"description"`
+}
 
 var AllSatellites = make(map[string]Satellite)
 

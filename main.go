@@ -4,6 +4,7 @@ import (
 	"github.com/fsena92/meli-operacion-fuego/api"
 	"github.com/gin-gonic/gin"
 	"github.com/fsena92/meli-operacion-fuego/config"
+	_ "github.com/fsena92/meli-operacion-fuego/docs"
 )
 
 // @title Fire Operation Api

@@ -9,7 +9,7 @@ import (
 
 const decimals = 0.05
 
-// GetLocation returns the position of the ship with the satellites information
+/* GetLocation returns the position of the ship with the satellites information */
 func GetLocation(distances []float32) (float32, float32){
 	solutionX, solutionY, err := TrilaterationSolution(distances)
 	if err != nil {
@@ -19,6 +19,7 @@ func GetLocation(distances []float32) (float32, float32){
 	return float32(solutionX), float32(solutionY)
 }
 
+/* Validate_Location validates the point returned on TrilaterarionSolution */
 func Validate_Location(x float32, y float32, distances []float32) bool{
 		a1 := structs.SatellitesConfigured[0].Position.X
 		b1 := structs.SatellitesConfigured[0].Position.Y
@@ -31,7 +32,7 @@ func Validate_Location(x float32, y float32, distances []float32) bool{
 		}
 		return true
 }
-// TrilaterationSolution uses Cramer's rule with determinant matrices to find the solution of a system of linear equation with 2 variables
+/* TrilaterationSolution uses Cramer's rule with determinant matrices to find the solution of a system of linear equation with 2 variables */
 func TrilaterationSolution(distances []float32)(float64, float64, error){
 	//485.7, 266.1, 600
 	var r1 float32 = distances[0]//485.7
@@ -83,24 +84,17 @@ func TrilaterationSolution(distances []float32)(float64, float64, error){
 	if det != 0 {
 		val1 := round(float64(det1 / det), decimals)
 		val2 := round(float64(det2 / det), decimals)
-		// val1 := float64(det1 / det)
-		// val2 := float64(det2 / det)
-		// difX := (round(val1, decimals) - float64(a1))
-		// difY := (round(val2, decimals) - float64(b1))
-		// difX := (val1 - float64(a1))
-		// difY := (val2 - float64(b1))
-		//condition := round(math.Sqrt(math.Pow(difX, 2) +  math.Pow(difY, 2)), decimals)
 		return val1, val2, nil
 	}
 	return 0, 0, errors.New("Not found a solution")
 }
 
-// Create matrix for determinant
+/* Create matrix for determinant */
 func createMatrix(x1,y1,x2,y2 float32)([2][2]float32) {
 	return [2][2]float32{{x1,y1}, {x2,y2},}
 }
 
-// Determinant from 2x2 matrix
+/* Determinant from 2x2 matrix */
 func determinant(mat [2][2]float32) float32 {
 	var ans float32
 	ans = mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0]

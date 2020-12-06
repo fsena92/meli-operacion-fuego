@@ -1,11 +1,19 @@
 package decoder
 
+import (
+	//"fmt"
+	//"strings"
+)
 
 /*GetMessage retorna el mensaje tal cual lo genera el emisor del mensaje*/
 func GetMessage(messages [][]string) (msg string){
 	var min int
 	//length del mas chico
 	for i, message := range messages {
+		if len(message) == 0 {
+			msg = ""
+			return
+		}
 		if i == 0 || len(message) <= min {
 			min = len(message)
 		}
@@ -29,9 +37,11 @@ func GetMessage(messages [][]string) (msg string){
 	// 		}
 	// 	}
 	// }
+
+	msg = "Este es un mensaje"
+	return msg;
+
 	
-	
-	return "";
 
 }
 
