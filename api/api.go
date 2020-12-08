@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	ship "github.com/fsena92/meli-operacion-fuego/ship"
+	"github.com/fsena92/meli-operacion-fuego/ship"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

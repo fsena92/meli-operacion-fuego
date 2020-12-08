@@ -38,8 +38,6 @@ type ResponseError struct {
 	Description string 		`json:"description"`
 }
 
-var AllSatellites = make(map[string]Satellite)
-
 /*SatellitesConfigured represents the list of satellites configurated in the application*/
 var SatellitesConfigured []Satellite
 

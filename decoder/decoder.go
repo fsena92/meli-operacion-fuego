@@ -1,60 +1,61 @@
 package decoder
 
 import (
-	//"fmt"
-	//"strings"
+	"strings"
 )
 
-/*GetMessage retorna el mensaje tal cual lo genera el emisor del mensaje*/
+/*GetMessage returns the message generated from the ship*/
 func GetMessage(messages [][]string) (msg string){
-	var min int
-	//length del mas chico
-	for i, message := range messages {
-		if len(message) == 0 {
-			msg = ""
-			return
+	
+	var firstMessage []string = messages[0]
+	var otherMessages [][]string
+
+	otherMessages = append(otherMessages, messages[1], messages[2])
+
+	var completeMessage []string
+	word := ""	
+		for i := 0; i < len(firstMessage); i++ {
+			word = firstMessage[i];
+			if word == "" {
+				for _, otherMessage := range otherMessages {
+					word = otherMessage[i];
+					if word != ""{
+						break
+					}
+						
+				}
+			}
+			completeMessage = append(completeMessage, word);
+			
+			if completeMessage[len(completeMessage) - 1] != "" && (i + 1) != len(firstMessage) {
+				completeMessage = append(completeMessage, " ");
+			}
 		}
-		if i == 0 || len(message) <= min {
-			min = len(message)
-		}
+		msg = strings.Join(completeMessage, "")
+		return strings.Join(strings.Fields(msg), " ")
+		
+}
+/*ValidateMessages validates the length of the messages in the request*/
+func ValidateMessages(messages [][]string) bool{
+	
+	if len(messages) != 3 {
+		return false
 	}
 	
-	var offset []string
-	//evaluar cuales tienen defasaje
-	for i, message := range messages {
-		if len(message) > min {
-			offset = append(offset, message[i])
-		}
+	firstMessageLength := len(messages[0])
+	var actualMessageLength int
+
+	for i:=1; i < len(messages); i++ {
+		actualMessageLength = len(messages[i])
+		if actualMessageLength != firstMessageLength {
+			return false
+		} 
 	}
-	//sacar defasaje
-
-	// var originalMessage []string
-	// //reconstruir msj
-	// for i:= 0; i< len(messages); i++ {
-	// 	for j:= 0; j < len(messages[i]); j++ {
-	// 		if messages[i][j] != "" {
-	// 			originalMessage[j] = messages[i][j]
-	// 		}
-	// 	}
-	// }
-
-	msg = "Este es un mensaje"
-	return msg;
-
-	
-
+	return true
 }
 
-func Validate_Message(message string) bool{
+/*ValidateMessage validates the message generated */
+func ValidateMessage(message string) bool{
 	return message != ""
-}
-
-func contains(elements []string, name string) bool {
-	for _, element := range elements {
-		if element == name {
-			return true
-		}
-	}
-	return false
 }
 

@@ -1,7 +1,6 @@
 package ship
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"github.com/fsena92/meli-operacion-fuego/structs"
@@ -31,7 +30,7 @@ func TopSecret(ctx *gin.Context){
 		ctx.JSON(http.StatusBadRequest, gin.H{"error with body request": err.Error()})
 		return
 	}
-	if !validateSatellitesRequested(request.Satellites){
+	if !resolver.ValidateSatellitesRequested(request.Satellites){
 		ctx.JSON(http.StatusBadRequest, &structs.ResponseError{ Description: "Satellites missing or repeated"})
 		return
 	}
@@ -45,23 +44,25 @@ func TopSecret(ctx *gin.Context){
 					}
 				} 
 		}
-		
-	//Llamar a funcion getLocation y getMessage
 	
 	//validate distances and messages
-	fmt.Println("distances: ", distances)
 	var translator structs.Translator
 	translator.Position.X, translator.Position.Y = resolver.GetLocation(distances)
 	
-	if !resolver.Validate_Location(translator.Position.X, translator.Position.Y, distances){
+	if !resolver.ValidateLocation(translator.Position.X, translator.Position.Y, distances){
 		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Invalid distances with coordinates"})
+		return
+	}
+
+	if !decoder.ValidateMessages(messages){
+		ctx.JSON(http.StatusBadRequest, &structs.ResponseError{ Description: "Invalid message or invalid message length in any satellite"})
 		return
 	}
 
 	translator.Message = decoder.GetMessage(messages)
 
-	if !decoder.Validate_Message(translator.Message){
-		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Invalid message in any satellite or can't tranlate message"})
+	if !decoder.ValidateMessage(translator.Message){
+		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Can't translate message"})
 		return
 	}
 	ctx.JSON(http.StatusOK, translator)
@@ -89,10 +90,14 @@ func TopSecretSplitPost(ctx *gin.Context){
 	satellite.Name = strings.ToLower(satelliteName)
 
 	//Validate if satellite_name exists in satellites configured 
-	if contains(structs.SatellitesConfigured, strings.ToLower(satelliteName)){
-		a := cache.SetCache(satellite.Name, satellite)
-		fmt.Println(a)
-		ctx.JSON(http.StatusOK, satellite)
+	if resolver.ValidateSatelliteNameExistsInConfig(satellite.Name){
+		inserted := cache.SetCache(satellite.Name, satellite)
+		if inserted {
+			ctx.JSON(http.StatusOK, satellite)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, &structs.ResponseError{ Description: "Can't save the satellite data"})
+		}
+		
 	} else {
 			ctx.JSON(http.StatusBadRequest, &structs.ResponseError{ Description: satellite.Name + " not registered in the satellites configured"})
 		}
@@ -110,7 +115,6 @@ func TopSecretSplitPost(ctx *gin.Context){
 // @Failure 500 {object} structs.ResponseError
 // @Router /topsecret_split [get]
 func TopSecretSplitGet(ctx *gin.Context){
-	fmt.Println(cache.CountingItems())
 	if cache.CountingItems() != 3 {
 		ctx.JSON(http.StatusBadRequest, &structs.ResponseError{ Description: "Missing distances and messages from satellites"})
 		return
@@ -127,58 +131,26 @@ func TopSecretSplitGet(ctx *gin.Context){
 			ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Satellite not found: " + satellite.Name})
 			return
 		}	
-		//cargar las distancias y los mensajes
+		//load distances and messages
 		satellitesData = append(satellitesData, satelliteData)
 		distances = append(distances, satelliteData.Distance)
 		messages = append(messages, satelliteData.Message)
 	}
 
 	translator.Position.X, translator.Position.Y = resolver.GetLocation(distances)
-	if !resolver.Validate_Location(translator.Position.X, translator.Position.Y, distances){
+	if !resolver.ValidateLocation(translator.Position.X, translator.Position.Y, distances){
 		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Invalid distances with coordinates"})
 		return
 	}
 
 	translator.Message = decoder.GetMessage(messages)
 	//validate message
-	if !decoder.Validate_Message(translator.Message){
-		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Invalid message in any satellite or can't translate message"})
+	if !decoder.ValidateMessage(translator.Message){
+		ctx.JSON(http.StatusNotFound, &structs.ResponseError{ Description: "Can't translate message"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, translator)
-}
-
-
-func validateSatellitesRequested(satellitesRequested []structs.SatelliteRequest) bool{
-
-	// validate number of satellites
-	if len(satellitesRequested) != 3 {
-		return false
-	}
-	//validate distinct satellites in request
-	if ((strings.ToLower(satellitesRequested[0].Name) == strings.ToLower(satellitesRequested[1].Name)) || (strings.ToLower(satellitesRequested[1].Name) == strings.ToLower(satellitesRequested[2].Name)) || (strings.ToLower(satellitesRequested[0].Name) == strings.ToLower(satellitesRequested[2].Name))){
-			return false
-	}
-
-	//validate satellites registered in config
-	for _, satelliteRequested := range satellitesRequested {
-		if (!contains(structs.SatellitesConfigured, strings.ToLower(satelliteRequested.Name))){
-			return false
-		}
-	}
-
-	return true
-}
-
-
-func contains(elements []structs.Satellite, name string) bool {
-	for _, element := range elements {
-		if element.Name == name {
-			return true
-		}
-	}
-	return false
 }
 
 

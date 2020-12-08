@@ -4,12 +4,12 @@ import (
 	"github.com/fsena92/meli-operacion-fuego/structs"
 	"errors"
 	"math"
-	"fmt"
+	"strings"
 )
 
 const decimals = 0.05
 
-/* GetLocation returns the position of the ship with the satellites information */
+/*GetLocation returns the position of the ship with the satellites information */
 func GetLocation(distances []float32) (float32, float32){
 	solutionX, solutionY, err := TrilaterationSolution(distances)
 	if err != nil {
@@ -18,26 +18,57 @@ func GetLocation(distances []float32) (float32, float32){
 
 	return float32(solutionX), float32(solutionY)
 }
+/*ValidateSatellitesRequested validates the number of the satellites, the satellites registered in the configuration*/
+func ValidateSatellitesRequested(satellitesRequested []structs.SatelliteRequest) bool{
+	// validate number of satellites
+	if len(satellitesRequested) != 3 {
+		return false
+	}
+	//validate distinct satellites in request
+	if ((strings.ToLower(satellitesRequested[0].Name) == strings.ToLower(satellitesRequested[1].Name)) || (strings.ToLower(satellitesRequested[1].Name) == strings.ToLower(satellitesRequested[2].Name)) || (strings.ToLower(satellitesRequested[0].Name) == strings.ToLower(satellitesRequested[2].Name))){
+			return false
+	}
+	//validate satellites registered in config
+	for _, satelliteRequested := range satellitesRequested {
+		if (!contains(structs.SatellitesConfigured, strings.ToLower(satelliteRequested.Name))){
+			return false
+		}
+	}
 
-/* Validate_Location validates the point returned on TrilaterarionSolution */
-func Validate_Location(x float32, y float32, distances []float32) bool{
+	return true
+}
+/*ValidateSatelliteNameExistsInConfig validates the satelite name in the request into the satellites configurated*/
+func ValidateSatelliteNameExistsInConfig(satelliteName string) bool{
+	return contains(structs.SatellitesConfigured, strings.ToLower(satelliteName))
+}
+
+func contains(elements []structs.Satellite, name string) bool {
+	for _, element := range elements {
+		if element.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+/*ValidateLocation validates the point returned on TrilaterarionSolution */
+func ValidateLocation(x float32, y float32, distances []float32) bool{
 		a1 := structs.SatellitesConfigured[0].Position.X
 		b1 := structs.SatellitesConfigured[0].Position.Y
 
 		difX := (round(float64(x), decimals) - float64(a1))
 		difY := (round(float64(y), decimals) - float64(b1))
-		fmt.Println(round(math.Sqrt(math.Pow(difX, 2) +  math.Pow(difY, 2)), 0.11), round(float64(distances[0]), 0.11))
 		if round(math.Sqrt(math.Pow(difX, 2) +  math.Pow(difY, 2)), 0.11) != round(float64(distances[0]), 0.11){
 			return false
 		}
 		return true
 }
-/* TrilaterationSolution uses Cramer's rule with determinant matrices to find the solution of a system of linear equation with 2 variables */
+/*TrilaterationSolution uses Cramer's rule with determinant matrices to find the solution of a system of linear equation with 2 variables */
 func TrilaterationSolution(distances []float32)(float64, float64, error){
-	//485.7, 266.1, 600
-	var r1 float32 = distances[0]//485.7
-	var r2 float32 = distances[1] //266.1
-	var r3 float32 = distances[2]//600
+	
+	var r1 float32 = distances[0]
+	var r2 float32 = distances[1] 
+	var r3 float32 = distances[2]
 
 	var a1 = structs.SatellitesConfigured[0].Position.X
 	var a2 = structs.SatellitesConfigured[1].Position.X
@@ -73,9 +104,6 @@ func TrilaterationSolution(distances []float32)(float64, float64, error){
 	d := createMatrix(A, B, D, E)
 	d1 := createMatrix(C, B, F, E)
 	d2 := createMatrix(A, C, D, F)
-
-	// auxX := ((C*E) - (F*B)) / (E*A - B*D)
-	// auxY:= (C*D - A*F) / (B*D - A*E)
 
 	det := determinant(d)
 	det1 := determinant(d1)

@@ -12,9 +12,6 @@ func LoadSatellites(){
 	var config = structs.Configuration{}
 	readFile(&config)
 	structs.SatellitesConfigured = config.Satellites
-	for _, s := range structs.SatellitesConfigured {
-        structs.AllSatellites[s.Name] = s
-    }
 }
 
 
