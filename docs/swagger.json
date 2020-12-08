@@ -15,8 +15,8 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
-    "basePath": "/",
+    "host": "fire-operation-api.herokuapp.com",
+    "basePath": "/api",
     "paths": {
         "/topsecret": {
             "post": {

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/fsena92/meli-operacion-fuego/api"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/fsena92/meli-operacion-fuego/config"
 	_ "github.com/fsena92/meli-operacion-fuego/docs"
 )
@@ -19,14 +20,15 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8080
-// @BasePath /
+// @host fire-operation-api.herokuapp.com
+// @BasePath /api
 
 
 func main() {
 	config.LoadSatellites()
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	api.Setup(router)
 	router.Run()
 	

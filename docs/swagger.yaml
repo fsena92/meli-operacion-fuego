@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api
 definitions:
   structs.Position:
     properties:
@@ -42,7 +42,7 @@ definitions:
       position:
         $ref: '#/definitions/structs.Position'
     type: object
-host: localhost:8080
+host: fire-operation-api.herokuapp.com
 info:
   contact:
     email: support@swagger.io
