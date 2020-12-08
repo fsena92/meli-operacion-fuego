@@ -17,6 +17,7 @@ import (
 // @Param request body structs.Request true "Datos necesarios de satélites para localizar la posición y obtener el mensaje del emisor"
 // @Success 200 {object} structs.Translator
 // @Failure 400 {object} structs.ResponseError
+// @Failure 403
 // @Failure 404	{object} structs.ResponseError
 // @Failure 500 {object} structs.ResponseError
 // @Router /topsecret [post]
@@ -76,6 +77,7 @@ func TopSecret(ctx *gin.Context){
 // @Param request body structs.SatelliteRequest true "Datos necesarios del satélite para localizar la posición y obtener el mensaje del emisor"
 // @Success 200 {object} structs.SatelliteRequest
 // @Failure 400 {object} structs.ResponseError
+// @Failure 403
 // @Failure 404	{object} structs.ResponseError
 // @Failure 500	{object} structs.ResponseError
 // @Router /topsecret_split/{satellite_name} [post]
@@ -111,6 +113,7 @@ func TopSecretSplitPost(ctx *gin.Context){
 // @Produce json
 // @Success 200 {object} structs.Translator
 // @Failure 400 {object} structs.ResponseError
+// @Failure 403
 // @Failure 404 {object} structs.ResponseError
 // @Failure 500 {object} structs.ResponseError
 // @Router /topsecret_split [get]
@@ -136,6 +139,9 @@ func TopSecretSplitGet(ctx *gin.Context){
 		distances = append(distances, satelliteData.Distance)
 		messages = append(messages, satelliteData.Message)
 	}
+	
+	//Deletes all satellites cached after loaded
+	cache.FlushCache()
 
 	translator.Position.X, translator.Position.Y = resolver.GetLocation(distances)
 	if !resolver.ValidateLocation(translator.Position.X, translator.Position.Y, distances){

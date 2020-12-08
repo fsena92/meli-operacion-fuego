@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//Top Secret
 func TestTopSecretWithValidSatellitesAndCoordinatesAndMessagesInRequest(t *testing.T) {
 	router := gin.Default()
 	api.Setup(router)
@@ -454,4 +455,34 @@ func TestTopSecretSplitGetWithoutSatellitesLoaded(t *testing.T) {
 	
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Equal(t, `{"description":"Missing distances and messages from satellites"}`, w.Body.String())
+}
+
+func TestTopSecretSplitGetWithSatellitesLoaded(t *testing.T) {
+	router := gin.Default()
+	api.Setup(router)
+	w1 := httptest.NewRecorder()
+	req1, _ := http.NewRequest("POST", "/api/topsecret_split/skywalker", strings.NewReader(`{
+		"distance": 265.75,
+		"message": ["", "es", "", "", "secreto"]
+	}`))
+	router.ServeHTTP(w1, req1)
+	w2 := httptest.NewRecorder()
+	req2, _ := http.NewRequest("POST", "/api/topsecret_split/sato", strings.NewReader(`{
+		"distance": 600.52,
+		"message": ["este", "", "un", "", ""]
+	}`))
+	router.ServeHTTP(w2, req2)
+	w3 := httptest.NewRecorder()
+	req3, _ := http.NewRequest("POST", "/api/topsecret_split/kenobi", strings.NewReader(`{
+		"distance": 485.41,
+		"message": ["este", "", "", "mensaje", ""]
+	}`))
+	router.ServeHTTP(w3, req3)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/topsecret_split", nil)
+	router.ServeHTTP(w, req)
+	
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, `{"position":{"x":-100,"y":75},"message":"este es un mensaje secreto"}`, w.Body.String())
 }

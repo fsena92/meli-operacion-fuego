@@ -23,6 +23,10 @@ func GetCache(key string) (structs.SatelliteRequest, bool) {
     return object, found
 }
 
+func FlushCache(){
+	Cache.Flush()
+}
+
 func CountingItems() int {
 	return Cache.ItemCount()
 }
