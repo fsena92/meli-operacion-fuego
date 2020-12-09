@@ -18,6 +18,7 @@ RUN apk --no-cache add ca-certificates tzdata && \
     apk del tzdata && rm -rf /var/cache/apk/* && date
 
 WORKDIR /app
+COPY --from=builder /build/*.json /app/
 COPY --from=builder /build/meli-operacion-fuego /app/
 
 CMD ["./meli-operacion-fuego"]

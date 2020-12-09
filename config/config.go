@@ -12,10 +12,11 @@ func LoadSatellites(){
 	var config = structs.Configuration{}
 	readFile(&config)
 	structs.SatellitesConfigured = config.Satellites
+
 }
 
 
 func readFile(cfg *structs.Configuration) {
-	file, _ := ioutil.ReadFile("config/config.json")
+	file, _ := ioutil.ReadFile("config.json")
 	_ = json.Unmarshal([]byte(file), cfg)
 } 
